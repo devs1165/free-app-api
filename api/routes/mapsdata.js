@@ -3,29 +3,19 @@ const router = express.Router();
 const Reading = require('../models/readingModel');
 
 router.get('/',(req,res,next) => { 
-    Reading.find().limit(8).select('location city country distance measurements geoLoc').exec()
+    var lat = req.query.lat,
+        lng = req.query.lng,
+        radius = req.query.radius; 
+    Reading.find( { geoLoc: { $geoWithin: { $center: [ [lat, lng], radius ] } } })
+    // .limit(8)
+    .select('location city country distance measurements geoLoc')
+    .exec()
     .then(docs => {
-        var data =[];
-        docs.map((val)=>{
-            val.measurements.map((v) => {
-                var para = v.parameter;
-                if (para !== "pm25") {
-                    
-                } else {
-                    
-                }
-            })
-            
-        })
-
+        // console.log(docs)
         const response = {
-            data:data
-            // count:docs.length,
-            // geoLoc:[],
-            // data:{
-            //     parameter:'',
-            //     value:''
-            // },
+            message:'map data fetched',
+            count:docs.length,
+            data:docs,
         }
         res.status(200).json(response)
     })
@@ -35,6 +25,8 @@ router.get('/',(req,res,next) => {
         })
     })
 })
+
+
 
 
 
