@@ -11,8 +11,8 @@ const mapRouter = require('./api/routes/mapsdata');
 const bestworstRouter = require('./api/routes/bestworst');
 
 
-mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2');
-// mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
+// mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2');
+mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
 
 // use bodyParser
 app.use(bodyParser.urlencoded({extended:false}));
