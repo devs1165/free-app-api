@@ -8,9 +8,11 @@ const request = require('request');
 const readingRouter = require('./api/routes/readings');
 const citiesRouter = require('./api/routes/cities');
 const mapRouter = require('./api/routes/mapsdata');
+const bestworstRouter = require('./api/routes/bestworst');
 
 
-mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
+mongoose.connect('mongodb://ds035683.mlab.com:35683/heroku_j72zc3t2');
+// mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
 
 // use bodyParser
 app.use(bodyParser.urlencoded({extended:false}));
@@ -64,6 +66,7 @@ app.get("/abc",function(req,res,next){
 app.use('/reading', readingRouter);
 app.use('/cities', citiesRouter);
 app.use('/map', mapRouter);
+app.use('/bestworst', bestworstRouter);
 
 
 
