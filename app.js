@@ -9,6 +9,8 @@ const readingRouter = require('./api/routes/readings');
 const citiesRouter = require('./api/routes/cities');
 const mapRouter = require('./api/routes/mapsdata');
 const bestworstRouter = require('./api/routes/bestworst');
+const userRouter = require('./api/routes/user');
+
 
 
 // mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2');
@@ -67,6 +69,8 @@ app.use('/reading', readingRouter);
 app.use('/cities', citiesRouter);
 app.use('/map', mapRouter);
 app.use('/bestworst', bestworstRouter);
+app.use('/user', bestworstRouter);
+
 
 
 
