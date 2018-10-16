@@ -15,7 +15,6 @@ router.get('/',(req,res,next)=>{
             message:'User created',
             result: result
         })
-        login(result);
     })
     .catch(err => {
         res.status(500).json({
@@ -27,7 +26,6 @@ router.get('/',(req,res,next)=>{
 
 // create and login user with generating token
 router.post('/',(req,res,next) => {
-    console.log(req.body)
     User.find({email:req.body.email})
     .exec()
     .then(user=>{

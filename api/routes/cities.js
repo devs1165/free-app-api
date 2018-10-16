@@ -5,7 +5,7 @@ const City = require('../models/citiesModel');
 const Reading = require('../models/readingModel');
 
 router.get('/', (req,res,next)=>{
-    City.find().select('quantity city')
+    City.find({user:req.query.userId}).select('quantity city')
     // for getting all detail from another collection use populate
     // use field name to get the selcted field
     .populate('city')
@@ -46,7 +46,8 @@ router.post('/', (req,res,next) => {
         } 
         // create order
         const newCity = new City({
-            _id:mongoose.Types.ObjectId(),
+            // _id:mongoose.Types.ObjectId(),
+            user:req.body.userId,
             quantity:1,
             city:req.body.cityId,
         })
