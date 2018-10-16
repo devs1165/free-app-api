@@ -85,7 +85,7 @@ app.use('/reading', readingRouter);
 app.use('/cities', citiesRouter);
 app.use('/map', mapRouter);
 app.use('/bestworst', bestworstRouter);
-app.use('/user', userRouter);
+app.use('/user/login', userRouter);
 // app.use('login/facebook',facebookRouter);
 
 
