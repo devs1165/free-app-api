@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
 const City = require('../models/citiesModel');
 const Reading = require('../models/readingModel');
 
-router.get('/', (req,res,next)=>{
-    City.find({user:req.query.userId}).select('quantity city')
+router.get('/', checkAuth, (req,res,next)=>{
+    City.find({user:req.query.userId})
+    .select('quantity city')
     // for getting all detail from another collection use populate
     // use field name to get the selcted field
     .populate('city')
@@ -34,7 +36,7 @@ router.get('/', (req,res,next)=>{
 })
 
 // create order
-router.post('/', (req,res,next) => {
+router.post('/', checkAuth, (req,res,next) => {
     // fetch reading
     Reading.findById(req.body.cityId)
     .then(resCity => {
@@ -73,7 +75,7 @@ router.post('/', (req,res,next) => {
 })
 
 // delete city byId
-router.delete('/:newCityId', (req,res,next)=>{
+router.delete('/:newCityId', checkAuth, (req,res,next)=>{
     City.remove({_id:req.params.newCityId}).exec()
     .then(result => {
         res.status(200).json({

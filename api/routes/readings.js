@@ -1,12 +1,14 @@
 const express = require('express');
 // const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
+
 const router = express.Router();
 const Reading = require('../models/readingModel')
 const NodeGeocoder = require('node-geocoder');
 
 
 // get all points
-router.get('/',(req,res,next) => { 
+router.get('/', checkAuth, (req,res,next) => { 
     Reading.find().limit(8).select('location city country distance measurements geoLoc').exec()
     .then(docs => {
         const response = {
@@ -27,7 +29,7 @@ router.get('/',(req,res,next) => {
 })
 
 // get points by lat:lng
-router.get('/:cityId', (req,res,next)=>{
+router.get('/:cityId', checkAuth, (req,res,next)=>{
     const id = req.params.cityId;
     Reading.findById(id).select('location city country distance measurements geoLoc').exec()
     .then( doc => {

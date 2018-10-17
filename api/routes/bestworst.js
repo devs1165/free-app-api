@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const checkAuth = require('../middleware/check-auth');
 const Reading = require('../models/readingModel');
 
-router.get('/',(req,res,next) => {
+router.get('/', checkAuth, (req,res,next) => {
     Reading.find()
     // .aggregate(
     //     [
