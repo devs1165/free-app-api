@@ -9,7 +9,9 @@ const NodeGeocoder = require('node-geocoder');
 
 // get all points
 router.get('/', checkAuth, (req,res,next) => { 
-    Reading.find().limit(8).select('location city country distance measurements geoLoc').exec()
+    Reading.find().
+    limit(8).
+    select('location city country distance measurements geoLoc').exec()
     .then(docs => {
         const response = {
             count:docs.length,

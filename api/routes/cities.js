@@ -12,7 +12,7 @@ router.get('/', checkAuth, (req,res,next)=>{
     // use field name to get the selcted field
     .populate('city')
     .exec()
-    .then(docs=>{
+    .then(docs => {
         res.status(200).json({
             message:'Cities were fetched',
             count:docs.length,
@@ -27,7 +27,7 @@ router.get('/', checkAuth, (req,res,next)=>{
             }),
         })
     })
-    .catch(err =>{
+    .catch(err => {
         res.status(500).json({
             message:'error occured',
             error:err
@@ -75,7 +75,7 @@ router.post('/', checkAuth, (req,res,next) => {
 })
 
 // delete city byId
-router.delete('/:newCityId', checkAuth, (req,res,next)=>{
+router.delete('/:newCityId', checkAuth, (req,res,next) => {
     City.remove({_id:req.params.newCityId}).exec()
     .then(result => {
         res.status(200).json({

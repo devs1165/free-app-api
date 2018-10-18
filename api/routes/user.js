@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
 const User = require('../models/userModel');
+const Tokens = require('../models/tokenModel');
 
 // get all users from db
 router.get('/',(req,res,next)=>{
@@ -25,7 +25,7 @@ router.get('/',(req,res,next)=>{
 
 
 // create and login user with generating token
-router.post('/',(req,res,next) => {
+router.post('/login',(req,res,next) => {
     User.find({email:req.body.email})
     .exec()
     .then(user=>{
@@ -41,10 +41,21 @@ router.post('/',(req,res,next) => {
                     expiresIn: '1h'
                 }
             );
-            return res.status(200).json({
-                message:'auth successful',
-                token:token
+            var toks = new Tokens({
+                userId:user[0]._id,
+                tokens:token
             })
+            toks.save().then(tok => {
+                res.status(200).json({
+                    message:'auth successful',
+                    token:tok
+                })
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error:err
+                })
+            });
         }
         else{
             // create user and generate token 
@@ -63,13 +74,28 @@ router.post('/',(req,res,next) => {
                     }, 
                         'secret', 
                     { 
-                        expiresIn: '1h'
+                        expiresIn:'1h'
                     }
                 );
-                res.status(201).json({
-                    message:'auth successful created and token generated',
-                    token:token
+                var toks = new Tokens({
+                    userId:result._id,
+                    tokens:token
                 })
+
+                toks.save().then(tok => {
+                    res.status(201).json({
+                        message:'auth successful created and token generated',
+                        token:tok
+                    })
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        error:err
+                    })
+                });
+
+
+
             })
             .catch(err => {
                 res.status(500).json({
@@ -78,6 +104,45 @@ router.post('/',(req,res,next) => {
             });
         }
     })
+    .catch(err => {
+        res.status(500).json({
+            error:err
+        })
+    });
+})
+
+
+// saving token to db 
+router.post('/refreshToken',(req,res,next) => {
+    const oldtoken = req.headers.authorization.split(" ")[1];
+    const decode = jwt.verify(oldtoken, 'secret');
+    console.log(decode);
+    const token = jwt.sign(
+        {
+            email: decode.email,
+            userId: decode.userId
+        }, 
+            'secret', 
+        { 
+            expiresIn: '1h'
+        }
+    );
+    // req.userData = decode;
+
+    Tokens.update({userId:decode.userId},{$set:{"tokens":token}})
+    // .exec()
+    .then(resul =>{
+        res.status(200).json({
+            message:'token refreshed ok',
+            token:token
+        })
+    })
+    .catch(err => {
+        res.status(500).json({
+            error:err
+        })
+    })
+
 })
 
 
