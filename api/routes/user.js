@@ -38,7 +38,7 @@ router.post('/login',(req,res,next) => {
                 }, 
                     'secret', 
                 { 
-                    expiresIn: '6h'
+                    expiresIn: '300'
                 }
             );
             var toks = new Tokens({
@@ -74,7 +74,7 @@ router.post('/login',(req,res,next) => {
                     }, 
                         'secret', 
                     { 
-                        expiresIn:'6h'
+                        expiresIn:'300'
                     }
                 );
                 var toks = new Tokens({
@@ -114,35 +114,51 @@ router.post('/login',(req,res,next) => {
 
 // saving token to db 
 router.post('/refreshToken',(req,res,next) => {
+
     const oldtoken = req.headers.authorization.split(" ")[1];
-    const decode = jwt.verify(oldtoken, 'secret');
-    console.log(decode);
-    const token = jwt.sign(
-        {
-            email: decode.email,
-            userId: decode.userId
-        }, 
-            'secret', 
-        { 
-            expiresIn: '1h'
+    const decode = jwt.verify(oldtoken, 'secret',(error,decoded)=>{
+        if (error.message === 'jwt expired'){
+            User.find({email:req.body.email})
+            .exec()
+            .then(user=>{
+            if(user.length >=1){
+                // generate token only
+                const token = jwt.sign(
+                    {
+                        email: user[0].email,
+                        userId: user[0]._id
+                    }, 
+                        'secret', 
+                    { 
+                        expiresIn: '600'
+                    }
+                );
+                var toks = new Tokens({
+                    userId:user[0]._id,
+                    tokens:token
+                })
+                Tokens.update({userId:user[0]._id},{$set:{"tokens":token}})
+                // .exec()
+                .then(resul =>{
+                    res.status(200).json({
+                        message:'token refreshed ok',
+                        token:token
+                    })
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        error:err
+                    })
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        error:err
+                    })
+                });
+            }
+        })
         }
-    );
-    // req.userData = decode;
-
-    Tokens.update({userId:decode.userId},{$set:{"tokens":token}})
-    // .exec()
-    .then(resul =>{
-        res.status(200).json({
-            message:'token refreshed ok',
-            token:token
-        })
-    })
-    .catch(err => {
-        res.status(500).json({
-            error:err
-        })
-    })
-
+    });
 })
 
 
