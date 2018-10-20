@@ -116,47 +116,47 @@ router.post('/login',(req,res,next) => {
 router.post('/refreshToken',(req,res,next) => {
 
     const oldtoken = req.headers.authorization.split(" ")[1];
-    const decode = jwt.verify(oldtoken, 'secret',(error,decoded)=>{
+    jwt.verify(oldtoken, 'secret',(error,decoded) => {
         if (error.message === 'jwt expired'){
             User.find({email:req.body.email})
             .exec()
             .then(user=>{
-            if(user.length >=1){
-                // generate token only
-                const token = jwt.sign(
-                    {
-                        email: user[0].email,
-                        userId: user[0]._id
-                    }, 
-                        'secret', 
-                    { 
-                        expiresIn: '600'
-                    }
-                );
-                var toks = new Tokens({
-                    userId:user[0]._id,
-                    tokens:token
-                })
-                Tokens.update({userId:user[0]._id},{$set:{"tokens":token}})
-                // .exec()
-                .then(resul =>{
-                    res.status(200).json({
-                        message:'token refreshed ok',
-                        token:token
+                if(user.length >=1){
+                    // generate token only
+                    const token = jwt.sign(
+                        {
+                            email: user[0].email,
+                            userId: user[0]._id
+                        }, 
+                            'secret', 
+                        { 
+                            expiresIn: '600'
+                        }
+                    );
+                    var toks = new Tokens({
+                        userId:user[0]._id,
+                        tokens:token
                     })
-                })
-                .catch(err => {
-                    res.status(500).json({
-                        error:err
+                    Tokens.findOneAndUpdate({userId:user[0]._id},{$set:{"tokens":token}})
+                    // .exec()
+                    .then(resul =>{
+                        res.status(200).json({
+                            message:'token refreshed ok',
+                            token:token
+                        })
                     })
-                })
-                .catch(err => {
-                    res.status(500).json({
-                        error:err
+                    .catch(err => {
+                        res.status(500).json({
+                            error:err
+                        })
                     })
-                });
-            }
-        })
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error:err
+                })
+            })
         }
     });
 })
