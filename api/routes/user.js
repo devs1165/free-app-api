@@ -38,7 +38,7 @@ router.post('/login',(req,res,next) => {
                 }, 
                     'secret', 
                 { 
-                    expiresIn: '1h'
+                    expiresIn: '6h'
                 }
             );
             var toks = new Tokens({
@@ -74,7 +74,7 @@ router.post('/login',(req,res,next) => {
                     }, 
                         'secret', 
                     { 
-                        expiresIn:'1h'
+                        expiresIn:'6h'
                     }
                 );
                 var toks = new Tokens({
