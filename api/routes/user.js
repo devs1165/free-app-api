@@ -34,12 +34,11 @@ router.post('/login',(req,res,next) => {
             const token = jwt.sign(
                 {
                     email: user[0].email,
-                    userId: user[0]._id
+                    userId: user[0]._id,
+                    iat: (new Date().getTime()),
+                    exp: (new Date().getTime() + 300000) 
                 }, 
-                    'secret', 
-                { 
-                    expiresIn: '300'
-                }
+                'secret' 
             );
             var toks = new Tokens({
                 userId:user[0]._id,
@@ -70,12 +69,11 @@ router.post('/login',(req,res,next) => {
                 const token = jwt.sign(
                     {
                         email: result.email,
-                        userId: result._id
+                        userId: result._id,
+                        iat: (new Date().getTime()),
+                        exp: (new Date().getTime() + 300000)
                     }, 
-                        'secret', 
-                    { 
-                        expiresIn:'300'
-                    }
+                    'secret' 
                 );
                 var toks = new Tokens({
                     userId:result._id,
@@ -93,9 +91,6 @@ router.post('/login',(req,res,next) => {
                         error:err
                     })
                 });
-
-
-
             })
             .catch(err => {
                 res.status(500).json({
@@ -114,10 +109,10 @@ router.post('/login',(req,res,next) => {
 
 // saving token to db 
 router.post('/refreshToken',(req,res,next) => {
-
     const oldtoken = req.headers.authorization.split(" ")[1];
     jwt.verify(oldtoken, 'secret',(error,decoded) => {
-        if (error.message === 'jwt expired'){
+        
+        if (decoded.exp > new Date().getTime()/1000){
             User.find({email:req.body.email})
             .exec()
             .then(user=>{
@@ -126,22 +121,18 @@ router.post('/refreshToken',(req,res,next) => {
                     const token = jwt.sign(
                         {
                             email: user[0].email,
-                            userId: user[0]._id
-                        }, 
-                            'secret', 
-                        { 
-                            expiresIn: '600'
-                        }
+                            userId: user[0]._id,
+                            iat: (new Date().getTime()),
+                            exp: (new Date().getTime() + 300000)
+                        },      
+                        'secret' 
                     );
-                    var toks = new Tokens({
-                        userId:user[0]._id,
-                        tokens:token
-                    })
                     Tokens.findOneAndUpdate({userId:user[0]._id},{$set:{"tokens":token}})
-                    // .exec()
+                    .exec()
                     .then(resul =>{
                         res.status(200).json({
                             message:'token refreshed ok',
+                            userId:user[0]._id,
                             token:token
                         })
                     })
