@@ -112,7 +112,7 @@ router.post('/refreshToken',(req,res,next) => {
     const oldtoken = req.headers.authorization.split(" ")[1];
     jwt.verify(oldtoken, 'secret',(error,decoded) => {
         
-        if (decoded.exp > new Date().getTime()/1000){
+        if (decoded.exp < new Date().getTime()){
             User.find({email:req.body.email})
             .exec()
             .then(user=>{
@@ -147,6 +147,11 @@ router.post('/refreshToken',(req,res,next) => {
                 res.status(500).json({
                     error:err
                 })
+            })
+        }
+        else{
+            res.status(200).json({
+                message:"token is alive can't refresh it"
             })
         }
     });
