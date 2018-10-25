@@ -6,7 +6,7 @@ const Reading = require('../models/readingModel');
 router.get('/', checkAuth, (req,res,next) => { 
     var lat = req.query.lat,
         lng = req.query.lng,
-        radius = req.query.radius,
+        radius = (req.query.radius > 1) ? 1 : req.query.radius,
         limit = (req.query.limit > 1) ? req.query.limit : 1; 
 
 
