@@ -1,6 +1,7 @@
 const express = require('express');
 // const mongoose = require('mongoose');
 const checkAuth = require('../middleware/check-auth');
+const jwt = require('jsonwebtoken')
 const router = express.Router();
 const Reading = require('../models/readingModel')
 // const NodeGeocoder = require('node-geocoder');
@@ -10,8 +11,10 @@ const City = require('../models/citiesModel');
 
 // get all points
 router.get('/', checkAuth, (req,res,next) => {
-   var selectedCity = getAllSelectedCities('5bc5c37f96d69b20873a2cd0')
-   selectedCity.then(function(result) {
+    const token = req.headers.authorization.split(" ")[1];
+    const decode = jwt.verify(token, 'secret')
+    var selectedCity = getAllSelectedCities(decode.userId)
+    selectedCity.then(function(result) {
         Reading.find({_id:{ $nin: result }}).
         limit(8).
         select('location city country distance measurements geoLoc').exec()
