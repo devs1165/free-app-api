@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const checkAuth = require('../middleware/check-auth');
 const City = require('../models/citiesModel');
 const Reading = require('../models/readingModel');
+
 
 router.get('/', checkAuth, (req,res,next)=>{
     City.find({user:req.query.userId})
@@ -35,44 +37,81 @@ router.get('/', checkAuth, (req,res,next)=>{
     })
 })
 
-// create order
+// add city
 router.post('/', checkAuth, (req,res,next) => {
-    // fetch reading
-    Reading.findById(req.body.cityId)
-    .then(resCity => {
-        // check if city is availiable
-        if (!resCity) {
-            return res.status(404).json({
-                message:'This is not a valid city'
+    const token = req.headers.authorization.split(" ")[1];
+    const decode = jwt.verify(token, 'secret');
+    var getCities = checkCities(decode.userId, req.body.cityId);
+    getCities.then(checkResult=> {
+        if(checkResult.length < 1){
+            // fetch reading to check city validation
+            Reading.findById(req.body.cityId)
+            .then(resCity => {
+                // check if city is availiable
+                if (!resCity) {
+                    return res.status(404).json({
+                        message:'This is not a valid city'
+                    })  
+                } 
+                // create order
+                const newCity = new City({
+                    user:req.body.userId,
+                    quantity:1,
+                    city:req.body.cityId,
+                })
+                return newCity.save()
+            })
+            .then(result => {
+                res.status(201).json({
+                    message:'city added to your profile',
+                    order:result,
+                    request:{
+                        type:'GET',
+                        url:'http://localhost:3000/reading/'+result.city
+                        
+                    }
+                })
             })  
-        } 
-        // create order
-        const newCity = new City({
-            // _id:mongoose.Types.ObjectId(),
-            user:req.body.userId,
-            quantity:1,
-            city:req.body.cityId,
-        })
-        return newCity.save()
+            .catch(err => {
+                res.status(500).json({
+                    message:"city not found",
+                    error:err
+                })
+            })
+            
+        }
+        else{
+            res.status(409).json({
+                message:'city already added please choose another city'
+            })    
+            
+        }
     })
-    .then(result => {
-        res.status(201).json({
-            message:'city added to your profile',
-            order:result,
-            request:{
-                type:'GET',
-                url:'http://localhost:3000/reading/'+result.city
-                
-            }
-        })
-    })  
     .catch(err => {
         res.status(500).json({
             message:"city not found",
             error:err
         })
     })
+    
 })
+
+// check cities in db by userId
+function checkCities(userId,cityId){
+    return City.find({user:userId,city:cityId}).then(result =>{
+        var arr = [];
+        result.map((v,i)=>{
+            arr.push(v.city)
+        })
+        return arr;
+    }).catch(err =>{
+        return err
+    })
+}
+
+
+
+
 
 // delete city byId
 router.delete('/:newCityId', checkAuth, (req,res,next) => {

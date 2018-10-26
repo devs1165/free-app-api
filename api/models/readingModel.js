@@ -23,6 +23,10 @@ const readingSchema = mongoose.Schema({
         coordinates: {
             type: [Number],
         }
+    },
+    timestamp:{
+        type:Date,
+        required:true
     }
 })
 

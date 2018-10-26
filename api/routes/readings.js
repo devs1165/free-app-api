@@ -15,9 +15,11 @@ router.get('/', checkAuth, (req,res,next) => {
     const decode = jwt.verify(token, 'secret')
     var selectedCity = getAllSelectedCities(decode.userId)
     selectedCity.then(function(result) {
-        Reading.find({_id:{ $nin: result }}).
-        limit(8).
-        select('location city country distance measurements geoLoc').exec()
+        Reading.find({_id:{ $nin: result }})
+        // .sort({timestamp:-1})
+        .limit(8)
+        .select('location city country distance measurements geoLoc timestamp')
+        .exec()
         .then(docs => {
             const response = {
                 count:docs.length,

@@ -57,7 +57,8 @@ app.get("/abc",function(req,res,next){
                 geoLoc:{
                     type: 'Point',
                     coordinates: coords
-                }
+                },
+                timestamp:Date.now()
             };
             
             var reading = new Readings(obj)
