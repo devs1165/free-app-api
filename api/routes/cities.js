@@ -7,9 +7,9 @@ const City = require('../models/citiesModel');
 const Reading = require('../models/readingModel');
 
 
-router.get('/', checkAuth, (req,res,next)=>{
+router.get('/', (req,res,next) => {
     City.find({user:req.query.userId})
-    .select('quantity city')
+    .select('city')
     // for getting all detail from another collection use populate
     // use field name to get the selcted field
     .populate('city')
@@ -20,6 +20,7 @@ router.get('/', checkAuth, (req,res,next)=>{
             count:docs.length,
             cities:docs.map(doc => {    
                 return{
+                    id:doc._id,
                     location:doc.city,
                     request:{
                         type:'GET',
@@ -115,6 +116,8 @@ function checkCities(userId,cityId){
 
 // delete city byId
 router.delete('/:newCityId', checkAuth, (req,res,next) => {
+    // const token = req.headers.authorization.split(" ")[1];
+    // const decode = jwt.verify(token, 'secret');
     City.remove({_id:req.params.newCityId}).exec()
     .then(result => {
         res.status(200).json({
