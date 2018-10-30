@@ -3,14 +3,15 @@ const router = express.Router();
 const checkAuth = require('../middleware/check-auth');
 const Reading = require('../models/readingModel');
 
-router.get('/', checkAuth, (req,res,next) => {
-    Reading.find()
-    // .aggregate(
-    //     [
-    //       { $match: { 'measurements.parameter' : "pm25" } },
-    //       { $sort: { 'measurements.value' : -1 } }
-    //     ]
-    // )
+router.get('/best', (req,res,next) => {
+    Reading
+    // .find()
+    .aggregate(
+        [
+          { $match: { 'measurements.parameter' : "pm25" } },
+          { $sort: { 'measurements.value' : -1 } }
+        ]
+    )
     // .sort({'measurements.value':-1}) // -1 for MAX 
     // .sort({'measurements.value':+1}) // +1 for MIN
     .limit(10)
@@ -35,5 +36,7 @@ router.get('/', checkAuth, (req,res,next) => {
         })
     })
 })
-
+router.get('/worst', (req,res,next) => {
+    
+})
 module.exports = router;
