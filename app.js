@@ -67,8 +67,6 @@ app.get("/abc",function(req,res,next){
             .then(result => {
                 if(i == d.length - 1)
                     res.status(200).send({
-                        data:result,
-                        count:result.length,
                         message:' data sucessfully saved to Db'
                     })
             })
@@ -103,7 +101,6 @@ function saveBestWorstData(v){
             })    
         }    
     })
-    // var bestworst = new bestworst()
 }
 
 app.use('/reading', readingRouter);
@@ -111,9 +108,6 @@ app.use('/cities', citiesRouter);
 app.use('/map', mapRouter);
 app.use('/bestworst', bestworstRouter);
 app.use('/user', userRouter);
-// app.use('login/facebook',facebookRouter);
-
-
 
 
 module.exports = app;

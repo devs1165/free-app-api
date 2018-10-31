@@ -4,7 +4,7 @@ const checkAuth = require('../middleware/check-auth');
 // const Reading = require('../models/readingModel');
 const BestWorstDb = require('../models/bestWorstModel')
 
-router.get('/best', (req,res,next) => {
+router.get('/best', checkAuth, (req,res,next) => {
     BestWorstDb.find()
     .sort({'pm25':+1})
     .limit(10)
@@ -24,7 +24,7 @@ router.get('/best', (req,res,next) => {
 })
 
 
-router.get('/worst', (req,res,next) => {
+router.get('/worst', checkAuth, (req,res,next) => {
     BestWorstDb.find()
     .sort({'pm25':-1})
     .limit(10)
