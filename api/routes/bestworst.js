@@ -6,9 +6,9 @@ const BestWorstDb = require('../models/bestWorstModel')
 
 router.get('/best', checkAuth, (req,res,next) => {
     BestWorstDb.find()
-    .sort({'pm25':+1})
+    .sort({pm25:+1, timestamp : -1})
     .limit(10)
-    .select('location city country pm25')
+    .select('location city country pm25 timestamp')
     .exec()
     .then(docs => {
         res.status(200).json({
@@ -26,9 +26,9 @@ router.get('/best', checkAuth, (req,res,next) => {
 
 router.get('/worst', checkAuth, (req,res,next) => {
     BestWorstDb.find()
-    .sort({'pm25':-1})
+    .sort({pm25:-1, timestamp: -1})
     .limit(10)
-    .select('location city country pm25')
+    .select('location city country pm25 timestamp')
     .exec()
     .then(docs => {
         res.status(200).json({

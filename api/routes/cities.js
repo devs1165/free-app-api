@@ -9,6 +9,7 @@ const Reading = require('../models/readingModel');
 
 router.get('/', (req,res,next) => {
     City.find({user:req.query.userId})
+    .sort({ timestamp : -1})
     .select('city')
     // for getting all detail from another collection use populate
     // use field name to get the selcted field

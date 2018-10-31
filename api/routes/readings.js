@@ -1,5 +1,4 @@
 const express = require('express');
-// const mongoose = require('mongoose');
 const checkAuth = require('../middleware/check-auth');
 const jwt = require('jsonwebtoken')
 const router = express.Router();
@@ -16,8 +15,8 @@ router.get('/', checkAuth, (req,res,next) => {
     var selectedCity = getAllSelectedCities(decode.userId)
     selectedCity.then(function(result) {
         Reading.find({_id:{ $nin: result }})
-        // .sort({timestamp:-1})
-        .limit(8)
+        .sort({timestamp:-1})
+        .limit(800)
         .select('location city country distance measurements geoLoc timestamp')
         .exec()
         .then(docs => {
