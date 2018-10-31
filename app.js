@@ -22,10 +22,10 @@ var uri1 = 'mongodb+srv://ambeedev:Ambee90526@app-openaq-data-cluster-jwqfm.mong
 // mongoose.connect(uri1,{useNewUrlParser:true})
     
 // m-lab mongo connection
-// mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2');
+mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2');
 
 // localhost mongo connection
-mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
+// mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
 
 // use bodyParser
 app.use(bodyParser.urlencoded({extended:false}));
