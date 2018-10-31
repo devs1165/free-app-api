@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Readings = require('./api/models/readingModel')
+const BestWorstDb = require('./api/models/bestWorstModel')
 const request = require('request');
 
 const readingRouter = require('./api/routes/readings');
@@ -60,12 +61,14 @@ app.get("/abc",function(req,res,next){
                 },
                 timestamp:Date.now()
             };
-            
+            saveBestWorstData(obj);
             var reading = new Readings(obj)
             reading.save()
             .then(result => {
                 if(i == d.length - 1)
                     res.status(200).send({
+                        data:result,
+                        count:result.length,
                         message:' data sucessfully saved to Db'
                     })
             })
@@ -80,7 +83,28 @@ app.get("/abc",function(req,res,next){
     })
 
 })
-
+function saveBestWorstData(v){
+    v.measurements.map((val,ind)=>{
+        var object;
+        if(val.parameter === 'pm25' && v!==undefined){
+             object = {
+                location: v.location,
+                city: v.city,
+                country: v.country,
+                pm25:val.value,
+                timestamp:Date.now()
+            }
+            var best =new BestWorstDb(object)
+            best.save()
+            .then(r=>{
+                console.log("best worst data saved to db");    
+            }).catch(err =>{
+                console.log("got an error");    
+            })    
+        }    
+    })
+    // var bestworst = new bestworst()
+}
 
 app.use('/reading', readingRouter);
 app.use('/cities', citiesRouter);

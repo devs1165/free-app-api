@@ -1,42 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const checkAuth = require('../middleware/check-auth');
-const Reading = require('../models/readingModel');
+// const Reading = require('../models/readingModel');
+const BestWorstDb = require('../models/bestWorstModel')
 
 router.get('/best', (req,res,next) => {
-    Reading
-    // .find()
-    .aggregate(
-        [
-          { $match: { 'measurements.parameter' : "pm25" } },
-          { $sort: { 'measurements.value' : -1 } }
-        ]
-    )
-    // .sort({'measurements.value':-1}) // -1 for MAX 
-    // .sort({'measurements.value':+1}) // +1 for MIN
+    BestWorstDb.find()
+    .sort({'pm25':+1})
     .limit(10)
-    // .select('location city country distance measurements geoLoc')
+    .select('location city country pm25')
     .exec()
     .then(docs => {
-        // docs.map((val) => {
-        //     val.map((v)=>{
-        //     })
-        //     // console.log(val.measurements)
-        // })
-        const response = {
-            message:'map data fetched',
-            count:docs.length,
-            data:docs,
-        }
-        res.status(200).json(response)
+        res.status(200).json({
+            message:'top 10 best cities',
+            data:docs
+        })
     })
     .catch(err => {
         res.status(500).json({
-            error:err
+            error:err            
         })
     })
 })
+
+
 router.get('/worst', (req,res,next) => {
-    
+    BestWorstDb.find()
+    .sort({'pm25':-1})
+    .limit(10)
+    .select('location city country pm25')
+    .exec()
+    .then(docs => {
+        res.status(200).json({
+            message:'top 10 worst cities',
+            data:docs
+        })
+    })
+    .catch(err => {
+        res.status(500).json({
+            error:err            
+        })
+    })    
 })
+
 module.exports = router;
