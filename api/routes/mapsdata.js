@@ -13,7 +13,7 @@ router.get('/', checkAuth, (req,res,next) => {
     Reading.find( { geoLoc: { $geoWithin: { $center: [ [lat, lng], radius ] } } })
     // .limit(parseInt(limit))
     .sort({ timestamp : -1})    
-    .select('location city country distance measurements geoLoc')
+    .select('location timestamp city country distance measurements geoLoc')
     .exec()
     .then(docs => {
         // console.log(docs)
