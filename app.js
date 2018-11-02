@@ -19,10 +19,10 @@ const userRouter = require('./api/routes/user');
 var uri = 'mongodb://ambeedev:Ambee90526@app-openaq-data-cluster-shard-00-00-jwqfm.mongodb.net:27017,app-openaq-data-cluster-shard-00-01-jwqfm.mongodb.net:27017,app-openaq-data-cluster-shard-00-02-jwqfm.mongodb.net:27017/test?ssl=true&replicaSet=app-openaq-data-cluster-shard-0&authSource=admin&retryWrites=true';
     // connection string for v3.6 and later
 var uri1 = 'mongodb+srv://ambeedev:Ambee90526@app-openaq-data-cluster-jwqfm.mongodb.net/ambee-ap-app?retryWrites=true'
-// mongoose.connect(uri1,{useNewUrlParser:true})
+mongoose.connect(uri1,{useNewUrlParser:true})
     
 // m-lab mongo connection
-mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2',{ useNewUrlParser : true });
+// mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2',{ useNewUrlParser : true });
 
 // localhost mongo connection
 // mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
@@ -45,6 +45,15 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+app.get('/',(req,res,next) => {
+    res.status(200).json({
+        message:"server is running to fetch latest data do nothing",
+        sub:"this is just a test message to check server is running or not",
+        credit:"powered by -Ambee"
+    })
+})
+
 
 
 app.get("/abc",function(req,res,next){
