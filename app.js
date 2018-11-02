@@ -56,7 +56,7 @@ app.get('/',(req,res,next) => {
 
 
 
-app.get("/abc",function(req,res,next){
+app.get("/feedreading",function(req,res,next){
     // openAq Data api
     var postOpenAqDataToDb = request('https://api.openaq.org/v1/latest?limit=8620',(err,resp,body)=>{
         var d = JSON.parse(body).results;
