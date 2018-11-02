@@ -9,8 +9,8 @@ router.get('/', checkAuth, (req,res,next) => {
         radius = req.query.radius,
         limit = req.query.limit ; 
 
-
     Reading.find( { geoLoc: { $geoWithin: { $center: [ [lat, lng], radius ] } } })
+    .limit(20)
     // .limit(parseInt(limit))
     .sort({ timestamp : -1})    
     .select('location timestamp city country distance measurements geoLoc')
