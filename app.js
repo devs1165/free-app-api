@@ -5,14 +5,18 @@ const bodyParser = require('body-parser');
 const Readings = require('./api/models/readingModel')
 const BestWorstDb = require('./api/models/bestWorstModel')
 const request = require('request');
+// const logger = require('bunyan');
+const morgan = require('morgan');
 
+// APIs
 const readingRouter = require('./api/routes/readings');
 const citiesRouter = require('./api/routes/cities');
 const mapRouter = require('./api/routes/mapsdata');
 const bestworstRouter = require('./api/routes/bestworst');
 const userRouter = require('./api/routes/user');
 // const facebookRouter = require('./api/routes/auth/facebook');
-
+app.use(morgan('combined'))
+ 
 
 // mongo cloud production  connection
     // connection string for v3.4
