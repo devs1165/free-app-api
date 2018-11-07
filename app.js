@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const Readings = require('./api/models/readingModel')
 const BestWorstDb = require('./api/models/bestWorstModel')
 const request = require('request');
+const _ = require('lodash');
+const async = require('async');
 // const logger = require('bunyan');
 const fs = require('fs');
 var path = require('path'); 
@@ -29,10 +31,10 @@ app.use(morgan('combined', { stream: accessLogStream }))
 var uri = 'mongodb://ambeedev:Ambee90526@app-openaq-data-cluster-shard-00-00-jwqfm.mongodb.net:27017,app-openaq-data-cluster-shard-00-01-jwqfm.mongodb.net:27017,app-openaq-data-cluster-shard-00-02-jwqfm.mongodb.net:27017/test?ssl=true&replicaSet=app-openaq-data-cluster-shard-0&authSource=admin&retryWrites=true';
     // connection string for v3.6 and later
 var uri1 = 'mongodb+srv://ambeedev:Ambee90526@app-openaq-data-cluster-jwqfm.mongodb.net/ambee-ap-app?retryWrites=true'
-mongoose.connect(uri1,{useNewUrlParser:true})
+//mongoose.connect(uri1,{useNewUrlParser:true})
     
 // m-lab mongo connection
-// mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2',{ useNewUrlParser : true });
+ mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2',{ useNewUrlParser : true });
 
 // localhost mongo connection
 // mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
@@ -57,7 +59,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/',(req,res,next) => {
-    res.status(200).json({
+    res.status(200).send({
         message:" server is running ",
         credit:"powered by -Ambee"
     })
@@ -70,40 +72,65 @@ app.get("/feedreading",function(req,res,next){
     var postOpenAqDataToDb = request('https://api.openaq.org/v1/latest?limit=8620',(err,resp,body)=>{
         var d = JSON.parse(body).results;
          
-        d.map(function(v,i) {
-            var coords;
-            if(v.coordinates!==undefined){
-                coords = [v.coordinates.latitude,v.coordinates.longitude]
-            }
-            var obj = {
-                location: v.location,
-                city: v.city,
-                country: v.country,
-                distance: v.distance,
-                measurements:v.measurements,
-                geoLoc:{
-                    type: 'Point',
-                    coordinates: coords
-                },
-                timestamp:Date.now()
-            };
-            saveBestWorstData(obj);
-            var reading = new Readings(obj)
-            reading.save()
-            .then(result => {
-                if(i == d.length - 1)
-                    res.status(200).send({
-                        message:' data sucessfully saved to Db'
-                    })
-            })
-            .catch(err => {
-                if(i == d.length - 1)
-                    res.status(500).send({
-                        message:'an error occured while saving data to db',
-                        error:err
-                    })
-            })
-        })
+	var chunks = _.chunk(d, 2000);
+	
+	var operations = [];
+
+	chunks.map((val, key) => {
+		var operation = function(callback){
+			var counter = 0;
+			val.map(function(v,i) {
+                	var coords;
+                	if(v.coordinates!==undefined){
+                        	coords = [v.coordinates.latitude,v.coordinates.longitude]
+                	}
+                	var obj = {
+                        	location: v.location,
+                       		city: v.city,
+                        	country: v.country,
+                        	distance: v.distance,
+                        	measurements:v.measurements,
+                        	geoLoc:{
+                                	type: 'Point',
+                                	coordinates: coords
+                        	},
+                        	timestamp:Date.now()
+                	};
+               		saveBestWorstData(obj);
+                	var reading = new Readings(obj)
+                	reading.save()
+                        .then(result => {
+				counter += 1;
+                                if(i == d.length - 1)
+                                        res.status(200).send({
+                                                message:' data sucessfully saved to Db'
+                                        })
+					console.log("success -------", counter, " total -----", val.length)
+					if(counter == val.length)
+						callback();
+                                })
+                        .catch(err => {
+				console.log(err);
+				counter += 1
+                                if(i == d.length - 1)
+                                        res.status(500).send({
+                                                message:'an error occured while saving data to db',
+                                                error:err
+                                        })
+					console.log("failed -------", counter, " total -----", val.length)
+
+					if(counter == val.length)
+						callback();
+                        	})
+                	})
+		}
+
+		operations.push(operation)		
+	})
+
+	async.series(operations, () => {
+		console.log("Finished a batch process");
+	})
     })
 
 })
