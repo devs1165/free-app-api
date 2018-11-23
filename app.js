@@ -24,17 +24,9 @@ const userRouter = require('./api/routes/user');
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 app.use(morgan('combined', { stream: accessLogStream }))
 // app.use(morgan('dev'))
- 
-
-// mongo cloud production  connection
-    // connection string for v3.4
-var uri = 'mongodb://ambeedev:Ambee90526@app-openaq-data-cluster-shard-00-00-jwqfm.mongodb.net:27017,app-openaq-data-cluster-shard-00-01-jwqfm.mongodb.net:27017,app-openaq-data-cluster-shard-00-02-jwqfm.mongodb.net:27017/test?ssl=true&replicaSet=app-openaq-data-cluster-shard-0&authSource=admin&retryWrites=true';
-    // connection string for v3.6 and later
-var uri1 = 'mongodb+srv://ambeedev:Ambee90526@app-openaq-data-cluster-jwqfm.mongodb.net/ambee-ap-app?retryWrites=true'
-//mongoose.connect(uri1,{useNewUrlParser:true})
-    
+     
 // m-lab mongo connection
- mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2',{ useNewUrlParser : true });
+mongoose.connect('mongodb://ambeedev:ambeedev1@ds035683.mlab.com:35683/heroku_j72zc3t2',{ useNewUrlParser : true });
 
 // localhost mongo connection
 // mongoose.connect('mongodb://127.0.0.1:27017/dev-openaqs-test',{ useNewUrlParser: true } )
